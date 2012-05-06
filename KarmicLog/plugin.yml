@@ -1,0 +1,15 @@
+name: KarmicLog
+main: com.mitsugaru.KarmicLog.KarmicLog
+description: Remix from the concept of GriefAlertR
+version: 0.1
+author: Mitsugaru
+depend: [Vault]
+
+commands:
+  kl:
+    description: Root command
+
+permissions:
+  KarmicLog.admin:
+    description: Administrate plugin
+    default: op
