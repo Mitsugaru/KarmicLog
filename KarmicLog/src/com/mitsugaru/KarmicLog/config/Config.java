@@ -23,15 +23,9 @@ public class Config
 {
 	// Class variables
 	private KarmicLog plugin;
-	public String host, port, database, user, password;
-	public static String tablePrefix;
-	public boolean debugTime, debugEvents, debugEconomy, debugUnhandled,
-			useMySQL, importSQL, portalCreateNether, portalCreateEnd,
-			portalCreateCustom, blockPlaceStatic, blockDestroyStatic,
-			craftItemStatic, enchantItemStatic, itemDropStatic, commandStatic,
-			pickupStatic, shootBowDenyForce;
-	public int listlimit;
-	public double shootBowForce;
+	// public String host, port, database, user, password;
+	// public static String tablePrefix;
+	public boolean debugTime, debugEvents;// useMySQL, importSQL,
 	private final Map<Item, KLItemInfo> values = new HashMap<Item, KLItemInfo>();
 
 	// TODO ability to change config in-game
@@ -48,15 +42,14 @@ public class Config
 		final ConfigurationSection config = plugin.getConfig();
 		// LinkedHashmap of defaults
 		final Map<String, Object> defaults = new LinkedHashMap<String, Object>();
-		defaults.put("listlimit", 10);
-		defaults.put("mysql.use", false);
-		defaults.put("mysql.host", "localhost");
-		defaults.put("mysql.port", 3306);
-		defaults.put("mysql.database", "minecraft");
-		defaults.put("mysql.user", "username");
-		defaults.put("mysql.password", "pass");
-		defaults.put("mysql.tablePrefix", "kl_");
-		defaults.put("mysql.import", false);
+		// defaults.put("mysql.use", false);
+		// defaults.put("mysql.host", "localhost");
+		// defaults.put("mysql.port", 3306);
+		// defaults.put("mysql.database", "minecraft");
+		// defaults.put("mysql.user", "username");
+		// defaults.put("mysql.password", "pass");
+		// defaults.put("mysql.tablePrefix", "kl_");
+		// defaults.put("mysql.import", false);
 		defaults.put("debug.events", false);
 		defaults.put("debug.time", false);
 		defaults.put("version", plugin.getDescription().getVersion());
@@ -74,14 +67,14 @@ public class Config
 		/**
 		 * SQL info
 		 */
-		useMySQL = config.getBoolean("mysql.use", false);
-		host = config.getString("mysql.host", "localhost");
-		port = config.getString("mysql.port", "3306");
-		database = config.getString("mysql.database", "minecraft");
-		user = config.getString("mysql.user", "user");
-		password = config.getString("mysql.password", "password");
-		tablePrefix = config.getString("mysql.prefix", "kl_");
-		importSQL = config.getBoolean("mysql.import", false);
+		// useMySQL = config.getBoolean("mysql.use", false);
+		// host = config.getString("mysql.host", "localhost");
+		// port = config.getString("mysql.port", "3306");
+		// database = config.getString("mysql.database", "minecraft");
+		// user = config.getString("mysql.user", "user");
+		// password = config.getString("mysql.password", "password");
+		// tablePrefix = config.getString("mysql.prefix", "kl_");
+		// importSQL = config.getBoolean("mysql.import", false);
 		// Load all other settings
 		this.loadSettings(config);
 		// Load config for item specific value
@@ -141,7 +134,7 @@ public class Config
 		plugin.reloadConfig();
 		// Grab config
 		ConfigurationSection config = plugin.getConfig();
-		//Load settings
+		// Load settings
 		this.loadSettings(config);
 		// Load config for item specific values
 		this.loadWatchItemMap();
@@ -155,73 +148,8 @@ public class Config
 		/**
 		 * General Settings
 		 */
-		listlimit = config.getInt("listlimit", 10);
 		debugTime = config.getBoolean("debug.time", false);
 		debugEvents = config.getBoolean("debug.events", false);
-		debugEconomy = config.getBoolean("debug.economy", false);
-		debugUnhandled = config.getBoolean("debug.unhandled", false);
-		/**
-		 * Event Settings
-		 */
-		// destroy
-		blockDestroyStatic = config.getBoolean("block.destroy.static", true);
-		// place
-		blockPlaceStatic = config.getBoolean("block.place.static", true);
-		/**
-		 * Item
-		 */
-		// craft
-		craftItemStatic = config.getBoolean("item.craft.static", true);
-		// enchant
-		enchantItemStatic = config.getBoolean("item.enchant.static", true);
-		// drop
-		itemDropStatic = config.getBoolean("item.drop.static", true);
-		// pickup
-		pickupStatic = config.getBoolean("item.drop.static", true);
-		/**
-		 * Bow
-		 */
-		// shoot
-		shootBowDenyForce = config
-				.getBoolean("bow.shoot.denyOnLowForce", false);
-		shootBowForce = config.getDouble("bow.shoot.minimumforce", 0.0);
-		/**
-		 * Player section
-		 */
-		// command
-		commandStatic = config.getBoolean("player.command.static", true);
-		/**
-		 * Portal
-		 */
-		// create nether
-		portalCreateNether = config.getBoolean("portal.createNether.enabled",
-				false);
-		// create end
-		portalCreateEnd = config.getBoolean("portal.createEnd.enabled", false);
-		// create custom
-		portalCreateCustom = config.getBoolean("portal.createCustom.enabled",
-				false);
-		/**
-		 * Vehicle
-		 * 
-		 * TODO implement
-		 */
-		// enter
-		/*
-		 * vehicleEnter = config.getBoolean("vehicle.enter.enabled", false);
-		 * vehicleEnterDenyPay =
-		 * config.getBoolean("vehicle.enter.denyOnLackPay", false);
-		 * vehicleEnterDenyLimit =
-		 * config.getBoolean("vehicle.enter.denyOnLimit", false);
-		 * vehicleEnterLimit = config.getInt("vehicle.enter.limit", 100);
-		 * vehicleEnterPay = config.getDouble("vehicle.enter.pay", 0.1);
-		 */
-		// exit
-		/*
-		 * vehicleExit = config.getBoolean("vehicle.exit.enabled", false);
-		 * vehicleExitLimit = config.getInt("vehicle.exit.limit", 100);
-		 * vehicleExitPay = config.getDouble("vehicle.exit.pay", 0.1);
-		 */
 	}
 
 	/**
@@ -338,7 +266,7 @@ public class Config
 
 	public Map<Item, KLItemInfo> getItemValueMap()
 	{
-		final Map<Item, KLItemInfo> values = new HashMap<Item,KLItemInfo>();
+		final Map<Item, KLItemInfo> values = new HashMap<Item, KLItemInfo>();
 		return values;
 	}
 
@@ -347,8 +275,6 @@ public class Config
 		KLItemInfo info = new KLItemInfo();
 		return info;
 	}
-
-	// TODO command value file
 
 	/**
 	 * Loads the value file. Contains default values If the value file isn't
@@ -360,13 +286,13 @@ public class Config
 	{
 		final File file = new File(plugin.getDataFolder().getAbsolutePath()
 				+ "/watch.yml");
-		// 
+		//
 		final YamlConfiguration watchFile = YamlConfiguration
 				.loadConfiguration(file);
 		if (watchFile.getKeys(false).isEmpty())
 		{
 			// Defaults
-			
+
 			// Insert defaults into file if they're not present
 			try
 			{
