@@ -23,6 +23,7 @@ public class Config
 {
 	// Class variables
 	private KarmicLog plugin;
+	private String node, message;
 	// public String host, port, database, user, password;
 	// public static String tablePrefix;
 	public boolean debugTime, debugEvents;// useMySQL, importSQL,
@@ -50,6 +51,9 @@ public class Config
 		// defaults.put("mysql.password", "pass");
 		// defaults.put("mysql.tablePrefix", "kl_");
 		// defaults.put("mysql.import", false);
+		defaults.put("defaults.permissionNode", "KarmicLog.notify");
+		//TODO message
+		defaults.put("defaults.message", "%shorttag %name : %event : %item");
 		defaults.put("debug.events", false);
 		defaults.put("debug.time", false);
 		defaults.put("version", plugin.getDescription().getVersion());
@@ -150,6 +154,8 @@ public class Config
 		 */
 		debugTime = config.getBoolean("debug.time", false);
 		debugEvents = config.getBoolean("debug.events", false);
+		node = config.getString("defaults.permissionNode", "KarmicLog.notify");
+		message = config.getString("defaults.message", "%shorttag %name : %event : %item");
 	}
 
 	/**
@@ -159,6 +165,18 @@ public class Config
 	private void boundsCheck()
 	{
 		// TODO format all doubles to 2 decimal places
+		if(node.equals(""))
+		{
+			plugin.getLogger().warning("Default permission node cannot be empty. Reverting to default...");
+			set("defaults.permissionNode", "KarmicLog.notify");
+			node = "KarmicLog.notify";
+		}
+		if(message.equals(""))
+		{
+			plugin.getLogger().warning("Default message cannot be empty. Reverting to default...");
+			set("defaults.message", "%shorttag %name : %event : %item");
+			message = "%shorttag %name : %event : %item";
+		}
 	}
 
 	/**
@@ -266,13 +284,23 @@ public class Config
 
 	public Map<Item, KLItemInfo> getItemValueMap()
 	{
-		final Map<Item, KLItemInfo> values = new HashMap<Item, KLItemInfo>();
 		return values;
 	}
 
 	private KLItemInfo parseInfo(YamlConfiguration config, String path)
 	{
-		KLItemInfo info = new KLItemInfo();
+		final boolean craftWatch = config.getBoolean(path + ".craft", false);
+		final boolean enchantWatch = config
+				.getBoolean(path + ".enchant", false);
+		final boolean placeWatch = config.getBoolean(path + ".place", false);
+		final boolean destroyWatch = config
+				.getBoolean(path + ".destroy", false);
+		final boolean pickupWatch = config.getBoolean(path + ".pickup", false);
+		final boolean dropWatch = config.getBoolean(path + ".drop", false);
+		final String itemMessage = config.getString(path + ".message", message);
+		final String permNode = config.getString(path + ".permissionNode", node);
+		KLItemInfo info = new KLItemInfo(craftWatch, enchantWatch, placeWatch,
+				destroyWatch, pickupWatch, dropWatch, itemMessage, permNode);
 		return info;
 	}
 
@@ -312,10 +340,30 @@ public class Config
 	// Private class to hold item specific information
 	public class KLItemInfo
 	{
+		private String message, node;
+		public boolean craft, enchant, place, destroy, pickup, drop;
 
-		public KLItemInfo()
+		public KLItemInfo(boolean craft, boolean enchant, boolean place,
+				boolean destroy, boolean pickup, boolean drop, String message, String node)
 		{
-
+			this.craft = craft;
+			this.enchant = enchant;
+			this.place = place;
+			this.destroy = destroy;
+			this.pickup = pickup;
+			this.drop = drop;
+			this.message = message;
+			this.node = node;
+		}
+		
+		public String getMessage()
+		{
+			return message;
+		}
+		
+		public String getNode()
+		{
+			return node;
 		}
 	}
 }
