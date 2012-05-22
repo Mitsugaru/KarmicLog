@@ -8,8 +8,10 @@ package com.mitsugaru.KarmicLog.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -23,7 +25,7 @@ public class Config
 {
 	// Class variables
 	private KarmicLog plugin;
-	private String node, message;
+	private String notify, ignore, message;
 	// public String host, port, database, user, password;
 	// public static String tablePrefix;
 	public boolean debugTime, debugEvents;// useMySQL, importSQL,
@@ -51,8 +53,9 @@ public class Config
 		// defaults.put("mysql.password", "pass");
 		// defaults.put("mysql.tablePrefix", "kl_");
 		// defaults.put("mysql.import", false);
-		defaults.put("defaults.permissionNode", "KarmicLog.notify");
-		//TODO message
+		defaults.put("defaults.permissionNotify", "KarmicLog.notify");
+		defaults.put("defaults.permissionIgnore", "KarmicLog.ignore");
+		// TODO message
 		defaults.put("defaults.message", "%shorttag %name : %event : %item");
 		defaults.put("debug.events", false);
 		defaults.put("debug.time", false);
@@ -154,8 +157,11 @@ public class Config
 		 */
 		debugTime = config.getBoolean("debug.time", false);
 		debugEvents = config.getBoolean("debug.events", false);
-		node = config.getString("defaults.permissionNode", "KarmicLog.notify");
-		message = config.getString("defaults.message", "%shorttag %name : %event : %item");
+		notify = config
+				.getString("defaults.permissionNotify", "KarmicLog.notify");
+		ignore = config.getString("defaults.permissionIgnore", "KarmicLog.ignore");
+		message = config.getString("defaults.message",
+				"%shorttag %name : %event : %item");
 	}
 
 	/**
@@ -164,16 +170,26 @@ public class Config
 	 */
 	private void boundsCheck()
 	{
-		// TODO format all doubles to 2 decimal places
-		if(node.equals(""))
+		if (notify.equals(""))
 		{
-			plugin.getLogger().warning("Default permission node cannot be empty. Reverting to default...");
+			plugin.getLogger()
+					.warning(
+							"Default permission notify node cannot be empty. Reverting to default...");
 			set("defaults.permissionNode", "KarmicLog.notify");
-			node = "KarmicLog.notify";
+			notify = "KarmicLog.notify";
 		}
-		if(message.equals(""))
+		if(ignore.equals(""))
 		{
-			plugin.getLogger().warning("Default message cannot be empty. Reverting to default...");
+			plugin.getLogger()
+			.warning(
+					"Default permission ignore node cannot be empty. Reverting to default...");
+			set("defaults.permissionIgnore", "KarmicLog.ignore");
+			ignore = "KarmicLog.ignore";
+		}
+		if (message.equals(""))
+		{
+			plugin.getLogger().warning(
+					"Default message cannot be empty. Reverting to default...");
 			set("defaults.message", "%shorttag %name : %event : %item");
 			message = "%shorttag %name : %event : %item";
 		}
@@ -297,10 +313,21 @@ public class Config
 				.getBoolean(path + ".destroy", false);
 		final boolean pickupWatch = config.getBoolean(path + ".pickup", false);
 		final boolean dropWatch = config.getBoolean(path + ".drop", false);
+		final boolean deny = config.getBoolean(path + ".deny", false);
+		List<String> worldList = config.getStringList(path + ".worlds");
+		if (worldList == null)
+		{
+			worldList = new ArrayList<String>();
+		}
 		final String itemMessage = config.getString(path + ".message", message);
-		final String permNode = config.getString(path + ".permissionNode", node);
+		final String notifyNode = config.getString(path + ".permissionNotify",
+				notify);
+		final String ignoreNode = config.getString(path + ".permissionIgnore",
+				ignore);
+
 		KLItemInfo info = new KLItemInfo(craftWatch, enchantWatch, placeWatch,
-				destroyWatch, pickupWatch, dropWatch, itemMessage, permNode);
+				destroyWatch, pickupWatch, dropWatch, deny, itemMessage,
+				notifyNode, ignoreNode, worldList);
 		return info;
 	}
 
@@ -340,11 +367,13 @@ public class Config
 	// Private class to hold item specific information
 	public class KLItemInfo
 	{
-		private String message, node;
-		public boolean craft, enchant, place, destroy, pickup, drop;
+		private String message, notifyNode, ignoreNode;
+		private List<String> list;
+		public boolean craft, enchant, place, destroy, pickup, drop, deny;
 
 		public KLItemInfo(boolean craft, boolean enchant, boolean place,
-				boolean destroy, boolean pickup, boolean drop, String message, String node)
+				boolean destroy, boolean pickup, boolean drop, boolean deny,
+				String message, String notify, String ignore, List<String> list)
 		{
 			this.craft = craft;
 			this.enchant = enchant;
@@ -353,17 +382,37 @@ public class Config
 			this.pickup = pickup;
 			this.drop = drop;
 			this.message = message;
-			this.node = node;
+			this.notifyNode = notify;
+			this.ignoreNode = ignore;
+			this.list = list;
 		}
-		
+
+		public boolean checkWorld(String world)
+		{
+			if (list.isEmpty())
+			{
+				return true;
+			}
+			else if (list.contains(world))
+			{
+				return true;
+			}
+			return false;
+		}
+
 		public String getMessage()
 		{
 			return message;
 		}
-		
-		public String getNode()
+
+		public String getNotifyNode()
 		{
-			return node;
+			return notifyNode;
+		}
+
+		public String getIgnoreNode()
+		{
+			return ignoreNode;
 		}
 	}
 }
